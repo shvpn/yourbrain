@@ -22,7 +22,9 @@ class QuizHomeScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.settings, color: Colors.orange),
-                    onPressed: () {},
+                    onPressed: () {
+                      showSettingsDialog(context);
+                    },
                   ),
                   IconButton(
                     icon: const Icon(Icons.language, color: Colors.orange),
@@ -521,6 +523,273 @@ Widget _buildButton(
             ),
           ],
         ),
+      ),
+    ),
+  );
+}
+
+void showSettingsDialog(BuildContext context) {
+  final size = MediaQuery.of(context).size;
+  final isSmallScreen = size.width < 600;
+
+  // These would typically be stored in SharedPreferences
+  bool soundEnabled = true;
+  String currentLanguage = "English";
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            insetAnimationDuration: const Duration(milliseconds: 200),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              width: isSmallScreen ? size.width * 0.85 : 400,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.orange.shade300, Colors.deepOrange.shade500],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 15,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with title and close button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Sound Setting
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.volume_up,
+                              color: Colors.deepOrange,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              "Sound",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const Spacer(),
+                            Switch(
+                              value: soundEnabled,
+                              onChanged: (value) {
+                                setState(() {
+                                  soundEnabled = value;
+                                });
+                                // Here you would save the preference
+                                // SharedPreferences.getInstance().then((prefs) {
+                                //   prefs.setBool('soundEnabled', value);
+                                // });
+                              },
+                              activeColor: Colors.deepOrange,
+                              activeTrackColor: Colors.orange.shade200,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          soundEnabled
+                              ? "Sound effects are enabled"
+                              : "Sound effects are disabled",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Language Setting
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.language,
+                              color: Colors.deepOrange,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              "Language",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Language options
+                        _buildLanguageOption(
+                          context,
+                          "English",
+                          currentLanguage,
+                          (selected) {
+                            setState(() {
+                              currentLanguage = selected;
+                            });
+                            // Save preference
+                            // SharedPreferences.getInstance().then((prefs) {
+                            //   prefs.setString('language', selected);
+                            // });
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        _buildLanguageOption(
+                          context,
+                          "Khmer",
+                          currentLanguage,
+                          (selected) {
+                            setState(() {
+                              currentLanguage = selected;
+                            });
+                            // Save preference
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Save Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.deepOrange,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 3,
+                      ),
+                      onPressed: () {
+                        // Save all settings and close dialog
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Save Settings",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+// Helper method to build language selection options
+Widget _buildLanguageOption(
+  BuildContext context,
+  String language,
+  String currentLanguage,
+  Function(String) onSelected,
+) {
+  final isSelected = language == currentLanguage;
+
+  return InkWell(
+    onTap: () => onSelected(language),
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.orange.shade100 : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? Colors.deepOrange : Colors.grey.shade300,
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            language,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.deepOrange : Colors.black87,
+            ),
+          ),
+          const Spacer(),
+          if (isSelected)
+            const Icon(Icons.check_circle, color: Colors.deepOrange, size: 20),
+        ],
       ),
     ),
   );

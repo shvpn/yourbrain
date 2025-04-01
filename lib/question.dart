@@ -10,7 +10,7 @@ class FlagImageWidget extends StatelessWidget {
   final double width;
   final double height;
 
-  FlagImageWidget({
+  const FlagImageWidget({
     super.key,
     required this.imageUrl,
     this.width = 200,
@@ -25,15 +25,12 @@ class FlagImageWidget extends StatelessWidget {
       height: height,
       fit: BoxFit.cover,
 
-      // Placeholder while loading
+      // Better placeholder with sizing
       placeholder:
           (context, url) => Container(
             width: width,
             height: height,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
-            ),
+            color: Colors.grey[300],
             child: const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
@@ -50,16 +47,27 @@ class FlagImageWidget extends StatelessWidget {
               color: Colors.grey[300],
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Center(
-              child: Icon(Icons.error_outline, color: Colors.red, size: 48),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 32),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    error.toString(),
+                    style: const TextStyle(color: Colors.red, fontSize: 10),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
             ),
           ),
-
-      // Optional: Cache management
-      //memCacheWidth: 400,
-      //memCacheHeight: 240,
-
-      // Optional: Customizing cache behavior
+      // Set a reasonable memcache size
+      memCacheWidth: 400,
+      memCacheHeight: 240,
     );
   }
 }
